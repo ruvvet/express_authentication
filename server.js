@@ -13,6 +13,9 @@ console.log(SESSION_SECRET);
 // app
 const app = express();
 
+//add our custom middleware
+const isLoggedIn = require('./middleware/isLoggedIn');
+
 // middlware
 app.set('view engine', 'ejs');
 
@@ -46,11 +49,29 @@ app.use(session(sessionObject));
 //   })
 // );
 
-app.get('/', (req, res) => {
-  res.render('index');
+//initialize passport + run through the middleware
+app.use(passport.initialize());
+app.use(passport.session()); //runs a session through the middleware
+
+// using flash throughout app to send temp messages to user
+// before every route attach a user to res.local
+app.use(flash());
+
+app.use((req, res, next) => {
+  res.locals.alerts = req.flash();
+  res.locals.currentUser = req.user;
+  next();
 });
 
-app.get('/profile', (req, res) => {
+app.get('/', (req, res) => {
+  console.log(res.locals.alerts);
+  res.render('index', { alerts: res.locals.alerts });
+});
+
+app.get('/profile', isLoggedIn, (req, res) => {
+  //anytime the route is accessed, check if user is logged in
+  // if logged in, render the page
+
   res.render('profile');
 });
 
@@ -71,14 +92,6 @@ module.exports = server;
 
 // session key  - issues a secret that stays with them to make sure they can stay logged in
 // every time they render a new page the secret stays with them until logout
-
-
-
-
-
-
-
-
 
 // QUESTIONS
 
