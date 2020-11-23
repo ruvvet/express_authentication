@@ -1,8 +1,14 @@
+// dependencies
+
 require('dotenv').config();
 const express = require('express');
 const layouts = require('express-ejs-layouts');
+
+// app
 const app = express();
 
+
+// middlware
 app.set('view engine', 'ejs');
 
 app.use(require('morgan')('dev'));
@@ -27,3 +33,14 @@ const server = app.listen(PORT, () => {
 });
 
 module.exports = server;
+
+
+
+// passport module allows authentication using username/password
+// there are multiple authetnication strategeies available at
+// http://www.passportjs.org/packages/passport-local/
+//
+// also Bcrypt to hash passwords - encrypts the pw
+
+// session key  - issues a secret that stays with them to make sure they can stay logged in
+// every time they render a new page the secret stays with them until logout
