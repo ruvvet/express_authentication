@@ -78,9 +78,9 @@ describe('User instance methods', function() {
     it('should validate a correct password', function(done) {
       db.user.findOne().then(function(user) {
         if (user.validPassword('123123123')) {
-          done();
-        } else {
           done(user);
+        } else {
+          done();
         }
       }).catch(function(error) {
         done(error);
