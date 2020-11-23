@@ -71,3 +71,16 @@ module.exports = server;
 
 // session key  - issues a secret that stays with them to make sure they can stay logged in
 // every time they render a new page the secret stays with them until logout
+
+
+
+
+
+
+
+
+
+// QUESTIONS
+
+// cookies
+// why do we need to serialize/deserialize credentials

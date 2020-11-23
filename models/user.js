@@ -16,21 +16,21 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
 
+    // validate password
+    validPassword(passwordTyped) {
+      let correctPassword = bcrypt.compareSync(passwordTyped, this.password);
+      console.log('Inside of validPassword', correctPassword);
+      return correctPassword;
+    }
 
-  // // validate password
-  // function validPassword (passwordTyped) {
-  //   let correctPassword = bcrypt.compareSync(passwordTyped, this.password);
-
-  //   return correctPassword;
-  // };
-
-  // // remove the pw before its userData is serialized/returned for any call
-  // // only removes pw from request, not from the DB itself
-  // function toJSON () {
-  //   let userData = this.get();
-  //   delete userData.password;
-  //   return userData;
-  // };
+    // remove the pw before its userData is serialized/returned for any call
+    // only removes pw from request, not from the DB itself
+    toJSON() {
+      console.log('Inside of the toJSON method');
+      let userData = this.get();
+      delete userData.password;
+      return userData;
+    }
   }
   user.init(
     {
@@ -62,8 +62,8 @@ module.exports = (sequelize, DataTypes) => {
         // for more validation
         validate: {
           len: {
-            args: [12, 99],
-            msg: 'Password must be between 12-99 characters.',
+            args: [8, 99],
+            msg: 'Password must be between 8-99 characters.',
           },
         },
       },
@@ -84,22 +84,24 @@ module.exports = (sequelize, DataTypes) => {
 
     //then set pw to equal the hashed version
     pendingUser.password = hash;
+    console.log(pendingUser);
   });
 
-  // validate password
-  user.prototype.validPassword = function (passwordTyped) {
-    let correctPassword = bcrypt.compareSync(passwordTyped, this.password);
+  // // validate password
+  // user.prototype.validPassword = function (passwordTyped) {
+  //   let correctPassword = bcrypt.compareSync(passwordTyped, this.password);
+  //   console.log('Inside of validPassword', correctPassword);
+  //   return correctPassword;
+  // };
 
-    return correctPassword;
-  };
-
-  // remove the pw before its userData is serialized/returned for any call
-  // only removes pw from request, not from the DB itself
-  user.prototype.toJSON = function () {
-    let userData = this.get();
-    delete userData.password;
-    return userData;
-  };
+  // // remove the pw before its userData is serialized/returned for any call
+  // // only removes pw from request, not from the DB itself
+  // user.prototype.toJSON = function () {
+  //   console.log('Inside of the toJSON method');
+  //   let userData = this.get();
+  //   delete userData.password;
+  //   return userData;
+  // };
 
   return user;
   // can i put these inside the model?????????????????????????????????
@@ -110,5 +112,3 @@ module.exports = (sequelize, DataTypes) => {
 
 // addhook is a sequelize method that adds a method
 // 'beforecreate' means >>> do it before its added to the table
-
-
