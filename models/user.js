@@ -5,6 +5,9 @@
 const bcrypt = require('bcrypt');
 
 const { Model } = require('sequelize');
+
+//module.exports is a function that has 2 parameters
+// parameters = sequelize and datatypes
 module.exports = (sequelize, DataTypes) => {
   class user extends Model {
     /**
@@ -18,16 +21,15 @@ module.exports = (sequelize, DataTypes) => {
 
     // validate password
     validPassword(passwordTyped) {
-      let correctPassword = bcrypt.compareSync(passwordTyped, this.password);
-      console.log('Inside of validPassword', correctPassword);
-      return correctPassword;
+
+      return bcrypt.compareSync(passwordTyped, this.password);
     }
 
     // remove the pw before its userData is serialized/returned for any call
     // only removes pw from request, not from the DB itself
     toJSON() {
-      console.log('Inside of the toJSON method');
       let userData = this.get();
+      // delete - deletes the key we give it
       delete userData.password;
       return userData;
     }
@@ -74,37 +76,23 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
 
+  //sequelize hooks
+  // have specific hooks  - https://sequelize.org/master/manual/hooks.html
+  // allows us to change a user as they come in
+
   user.addHook('beforeCreate', (pendingUser) => {
     //now bcrypt can hash the pw
     // call the hashsync function and pass in the user
     //hashSync ([input], [# of times its encrypted])
     // more than 12 encryptions will take a long time
     // 12x hash is safe + efficient
-    let hash = bcrypt.hashSync(pendingUser.password, 12);
 
     //then set pw to equal the hashed version
-    pendingUser.password = hash;
-    console.log(pendingUser);
+    pendingUser.password = bcrypt.hashSync(pendingUser.password, 12);
   });
 
-  // // validate password
-  // user.prototype.validPassword = function (passwordTyped) {
-  //   let correctPassword = bcrypt.compareSync(passwordTyped, this.password);
-  //   console.log('Inside of validPassword', correctPassword);
-  //   return correctPassword;
-  // };
-
-  // // remove the pw before its userData is serialized/returned for any call
-  // // only removes pw from request, not from the DB itself
-  // user.prototype.toJSON = function () {
-  //   console.log('Inside of the toJSON method');
-  //   let userData = this.get();
-  //   delete userData.password;
-  //   return userData;
-  // };
-
   return user;
-  // can i put these inside the model?????????????????????????????????
+
 };
 
 // HASH THE USER PASSWORD

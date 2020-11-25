@@ -32,10 +32,11 @@ router.post('/signup', (req, res) => {
         const successObject = {
           // successreidrect + successflash are passport recognized keywords
           successRedirect: '/',
-          successFlash: 'Account craeted, loggin in...', // passport reads this flash message and sends a flash message
+          successFlash: 'Account created, login in...', // passport reads this flash message and sends a flash message
         };
 
         passport.authenticate('local', successObject)(req, res);
+
       } else {
         // email already exists
         // so make a flash message
@@ -44,7 +45,7 @@ router.post('/signup', (req, res) => {
       }
     })
     .catch((err) => {
-      console.log('error', err);
+      console.log('error', err); // this is where we could see the model validation msg
       req.flash('error', 'Email/PW incorrect - Try again.');
       res.redirect('/auth/signup');
     });
@@ -62,6 +63,27 @@ router.post(
     failureFlash: 'Login attempt failed. Try again.',
   })
 );
+// passport.authenticate returns a function
+
+
+/// ALT
+
+// router.post(
+//   '/login', (req, res) =>{
+
+//     const render = passport.authenticate('local', {
+//       successRedirect: '/',
+//       failureRedirect: '/auth/login',
+//       successFlash: 'Logging in...',
+//       failureFlash: 'Login attempt failed. Try again.',
+//     });
+
+//     render(req, res)
+//   }
+// );
+
+
+
 
 //// LOGOUT//////////////////////////
 router.get('/logout', (req, res) => {

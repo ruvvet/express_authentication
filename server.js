@@ -3,18 +3,22 @@
 require('dotenv').config();
 const express = require('express');
 const layouts = require('express-ejs-layouts');
+
+
 const session = require('express-session');
 const passport = require('./config/ppConfig');
 const flash = require('connect-flash');
+
+//add our custom middleware
+const isLoggedIn = require('./middleware/isLoggedIn');
+
 const SESSION_SECRET = process.env.SESSION_SECRET;
 
-console.log(SESSION_SECRET);
 
 // app
 const app = express();
 
-//add our custom middleware
-const isLoggedIn = require('./middleware/isLoggedIn');
+
 
 // middlware
 app.set('view engine', 'ejs');
@@ -24,6 +28,11 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(__dirname + '/public'));
 app.use(layouts);
 
+
+
+
+
+
 // create a session ob
 // secret: the secret we're giving to the user on the site as a session cookie
 // resave: saves the session even if its modified/changing windows, so its initialized w/ false
@@ -31,23 +40,23 @@ app.use(layouts);
 // ?????????????????????????????????
 // read passport/express session docs
 
-const sessionObject = {
-  secret: SESSION_SECRET,
-  resave: false,
-  saveUninitialized: true,
-};
+// const sessionObject = {
+//   secret: SESSION_SECRET,
+//   resave: false,
+//   saveUninitialized: true,
+// };
 
-// the session will now use the object for each session
-app.use(session(sessionObject));
+// // the session will now use the object for each session
+// app.use(session(sessionObject));
 
 //alt way of writing the session//////
-// app.use(
-//   session({
-//     secret: SESSION_SECRET,
-//     resave: false,
-//     saveUninitialized: true,
-//   })
-// );
+app.use(
+  session({
+    secret: SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+  })
+);
 
 //initialize passport + run through the middleware
 app.use(passport.initialize());
@@ -68,6 +77,13 @@ app.get('/', (req, res) => {
   res.render('index', { alerts: res.locals.alerts });
 });
 
+
+// can set custom middleware for any route
+// route paths
+// first parameter = route
+// between = middlware
+// last is req/res
+
 app.get('/profile', isLoggedIn, (req, res) => {
   //anytime the route is accessed, check if user is logged in
   // if logged in, render the page
@@ -76,6 +92,11 @@ app.get('/profile', isLoggedIn, (req, res) => {
 });
 
 app.use('/auth', require('./routes/auth'));
+
+
+
+
+
 
 const PORT = process.env.PORT || 5000;
 const server = app.listen(PORT, () => {
